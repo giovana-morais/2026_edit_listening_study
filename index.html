@@ -33,7 +33,7 @@
     background: var(--paper);
     color: var(--ink);
     font-family: var(--mono);
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
@@ -58,7 +58,7 @@
   }
 
   .topbar-inner {
-    max-width: 760px;
+    max-width: 1060px;
     margin: 0 auto;
     padding: 16px 24px 12px;
     display: flex;
@@ -74,7 +74,7 @@
   }
 
   .trial-count {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
@@ -97,26 +97,39 @@
   /* ---------- page ---------- */
 
   main {
-    max-width: 760px;
+    max-width: 1060px;
     margin: 0 auto;
-    padding: 40px 24px 96px;
+    padding: 24px 24px 96px;
+  }
+
+  /* ---------- sticky instruction + source (trial screen only) ---------- */
+
+  .context-bar {
+    position: sticky;
+    top: var(--header-height, 64px);
+    z-index: 9;
+    background: var(--paper);
+    padding-top: 4px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line-soft);
   }
 
   .instruction-block {
-    margin-bottom: 30px;
+    margin-bottom: 12px;
   }
 
   .instruction-label {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .instruction-text {
-    font-size: 23px;
+    font-size: 21px;
     line-height: 1.35;
     font-weight: 500;
-    max-width: 24em;
+    max-width: 26em;
     margin: 0;
   }
 
@@ -130,6 +143,11 @@
     margin-bottom: var(--gap);
   }
 
+  .context-bar .source {
+    padding: 14px 16px;
+    margin-bottom: 0;
+  }
+
   .source-heading {
     display: flex;
     align-items: baseline;
@@ -140,11 +158,11 @@
 
   .source-title {
     font-weight: 700;
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .source-note {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted);
   }
 
@@ -207,7 +225,7 @@
 
   .timecode {
     flex: none;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
@@ -261,8 +279,8 @@
 
   .stim-letter {
     flex: none;
-    width: 26px;
-    font-size: 20px;
+    width: 30px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -282,15 +300,15 @@
 
   .scale-name {
     flex: none;
-    width: 158px;
-    font-size: 13px;
+    width: 210px;
+    font-size: 14px;
     line-height: 1.35;
   }
 
   .scale-name em {
     display: block;
     font-style: normal;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
   }
 
@@ -301,9 +319,9 @@
   }
 
   .anchor {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted);
-    width: 64px;
+    width: 70px;
     flex: none;
   }
   .anchor.high { text-align: left; }
@@ -312,15 +330,15 @@
   .choices input { position: absolute; opacity: 0; pointer-events: none; }
 
   .choices label {
-    width: 34px;
-    height: 30px;
+    width: 38px;
+    height: 34px;
     display: grid;
     place-items: center;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: #fff;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     font-variant-numeric: tabular-nums;
     transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
     user-select: none;
@@ -373,7 +391,7 @@
   }
 
   .remaining {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted);
   }
 
@@ -524,7 +542,7 @@
   /* ---------- debug ---------- */
 
   .debug {
-    max-width: 760px;
+    max-width: 1060px;
     margin: 0 auto 60px;
     padding: 0 24px;
     font-size: 13px;
@@ -557,7 +575,6 @@
 
   @media (max-width: 640px) {
     body { font-size: 14px; }
-    .instruction-text { font-size: 19px; }
     .scales { padding-left: 0; }
     .scale-name { width: 100%; }
     .anchor { display: none; }
@@ -602,7 +619,7 @@ const CONFIG = {
       name: "Audio quality",
       hint: "artifacts, clicks, muddiness",
       low: "Bad",
-      high: "Excellent"
+      high: "Same as original"
     },
     {
       id: "adherence",
@@ -912,21 +929,23 @@ function renderTrial() {
   }).join("");
 
   document.getElementById("main").innerHTML = `
-    <div class="instruction-block">
-      <div class="instruction-label">The edit that was requested</div>
-      <p class="instruction-text">${trial.item.instruction}</p>
-    </div>
-
-    <div class="source" data-sys="__source" data-playing="false">
-      <div class="source-heading">
-        <div class="source-title">Original audio</div>
-        <div class="source-note">for reference — you are not rating this</div>
+    <div class="context-bar">
+      <div class="instruction-block">
+        <div class="instruction-label">The edit that was requested</div>
+        <p class="instruction-text">${trial.item.instruction}</p>
       </div>
-      <div class="transport">
-        <button class="play-btn" data-sys="__source" data-playing="false"
-                aria-label="Play the original audio">${ICONS}</button>
-        <div class="scrub"><div class="scrub-fill"></div></div>
-        <div class="timecode">0:00 / --:--</div>
+
+      <div class="source" data-sys="__source" data-playing="false">
+        <div class="source-heading">
+          <div class="source-title">Original audio</div>
+          <div class="source-note">for reference — you are not rating this</div>
+        </div>
+        <div class="transport">
+          <button class="play-btn" data-sys="__source" data-playing="false"
+                  aria-label="Play the original audio">${ICONS}</button>
+          <div class="scrub"><div class="scrub-fill"></div></div>
+          <div class="timecode">0:00 / --:--</div>
+        </div>
       </div>
     </div>
 
@@ -1255,9 +1274,10 @@ function renderTaskInstructions() {
 
     <div class="defn">
       <h3>Audio quality</h3>
-      <p>How clean does it sound on its own terms? Ignore whether
+      <p>How good is the sound quality of the edited audio compared to the original audio?
+        Ignore whether
          the edit itself was any good, this is only about how it sounds.</p>
-      ${anchors("Bad", "Poor", "Fair", "Good", "Excellent")}
+      ${anchors("Bad quality", "Poor", "Fair", "Good", "Same quality as the original")}
     </div>
 
     <div class="defn">
@@ -1318,6 +1338,14 @@ function renderBreak() {
     renderTrial();
   });
 }
+
+function syncHeaderHeight() {
+  const topbar = document.querySelector(".topbar");
+  if (topbar) document.documentElement.style.setProperty("--header-height", `${topbar.offsetHeight}px`);
+}
+syncHeaderHeight();
+window.addEventListener("resize", syncHeaderHeight);
+window.addEventListener("load", syncHeaderHeight); // re-measure after web fonts settle
 
 renderIntro();
 
