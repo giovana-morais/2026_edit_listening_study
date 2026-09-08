@@ -593,7 +593,7 @@
    ============================================================ */
 
 const CONFIG = {
-  itemsPerSession: 15,       // how many trials each listener sees
+  itemsPerSession: 10,       // how many trials each listener sees
   shuffleSystems: true,      // randomise A-D order every trial
 
   scales: [
@@ -627,39 +627,28 @@ const CONFIG = {
 
   // Practice trial — never scored, never reused in the main set.
   practiceItems:
-    [
+      [
     {
-      "id": "testB_mixed-0018_natural_gemini_specific",
-      "instruction": "Make the insect sound like a much larger, heavier bug by drawing out the wingbeats so you can hear each individual flap instead of a fast buzz.",
-      "source": "assets/05_testB_mixed-0018_natural_gemini_specific/input.wav",
+      "id": "testB_mixed-0013_natural_qwen_vague",
+      "instruction": "Make the strike sound a lot more aggressive.",
+      "source": "assets/03_testB_mixed-0013_natural_qwen_vague/input.wav",
       "audio": {
-        "v1": "assets/05_testB_mixed-0018_natural_gemini_specific/v1.wav",
-        "v3": "assets/05_testB_mixed-0018_natural_gemini_specific/v3.wav",
-        "v2": "assets/05_testB_mixed-0018_natural_gemini_specific/v2.wav",
-        "v4": "assets/05_testB_mixed-0018_natural_gemini_specific/input.wav"
+        "v1": "assets/03_testB_mixed-0013_natural_qwen_vague/v1.wav",
+        "v3": "assets/03_testB_mixed-0013_natural_qwen_vague/v3.wav",
+        "v2": "assets/03_testB_mixed-0013_natural_qwen_vague/v2.wav",
+        "v4": "assets/03_testB_mixed-0013_natural_qwen_vague/input.wav"
       }
     }
   ],
 
-  screeningRounds: 6,       // headphone check trials
-  screeningPassMark: 5,     // correct answers needed to continue
+  screeningRounds: 3,       // headphone check trials
+  screeningPassMark: 2,     // correct answers needed to continue
   breakAfter: 5,            // show a pause screen after this many trials
 
   // `source` is the unedited original clip; `audio` maps each system id
   // to its edited WAV, both as paths relative to this HTML file.
   items:
-    [
-    {
-      "id": "testB_mixed-0004_dsp_qwen_vague",
-      "instruction": "Distant, submerged vibe",
-      "source": "assets/01_testB_mixed-0004_dsp_qwen_vague/input.wav",
-      "audio": {
-        "v1": "assets/01_testB_mixed-0004_dsp_qwen_vague/v1.wav",
-        "v3": "assets/01_testB_mixed-0004_dsp_qwen_vague/v3.wav",
-        "v2": "assets/01_testB_mixed-0004_dsp_qwen_vague/v2.wav",
-        "v4": "assets/01_testB_mixed-0004_dsp_qwen_vague/input.wav"
-      }
-    },
+      [
     {
       "id": "testB_mixed-0008_natural_qwen_specific",
       "instruction": "Make the creaking sound much heavier and deeper, like the massive wooden timbers of a giant ship groaning loudly.",
@@ -749,17 +738,6 @@ const CONFIG = {
       }
     },
     {
-      "id": "testB_mixed-0013_natural_qwen_vague",
-      "instruction": "Make the strike sound a lot more aggressive.",
-      "source": "assets/03_testB_mixed-0013_natural_qwen_vague/input.wav",
-      "audio": {
-        "v1": "assets/03_testB_mixed-0013_natural_qwen_vague/v1.wav",
-        "v3": "assets/03_testB_mixed-0013_natural_qwen_vague/v3.wav",
-        "v2": "assets/03_testB_mixed-0013_natural_qwen_vague/v2.wav",
-        "v4": "assets/03_testB_mixed-0013_natural_qwen_vague/input.wav"
-      }
-    },
-    {
       "id": "testB_mixed-0021_dsp_qwen_vague",
       "instruction": "Give the chomps more bite and snap",
       "source": "assets/07_testB_mixed-0021_dsp_qwen_vague/input.wav",
@@ -779,39 +757,6 @@ const CONFIG = {
         "v3": "assets/13_testB_mixed-0041_natural_gemini_specific/v3.wav",
         "v2": "assets/13_testB_mixed-0041_natural_gemini_specific/v2.wav",
         "v4": "assets/13_testB_mixed-0041_natural_gemini_specific/input.wav"
-      }
-    },
-    {
-      "id": "testB_mixed-0038_natural_qwen_specific",
-      "instruction": "Make the hard drive's clicking and spinning happen at a quicker pace, like it's working overtime and failing faster.",
-      "source": "assets/12_testB_mixed-0038_natural_qwen_specific/input.wav",
-      "audio": {
-        "v1": "assets/12_testB_mixed-0038_natural_qwen_specific/v1.wav",
-        "v3": "assets/12_testB_mixed-0038_natural_qwen_specific/v3.wav",
-        "v2": "assets/12_testB_mixed-0038_natural_qwen_specific/v2.wav",
-        "v4": "assets/12_testB_mixed-0038_natural_qwen_specific/input.wav"
-      }
-    },
-    {
-      "id": "testB_mixed-0046_dsp_qwen_specific",
-      "instruction": "Add a large hall reverb with a long decay time to create a cavernous, echoing impression of the pouring oil.",
-      "source": "assets/15_testB_mixed-0046_dsp_qwen_specific/input.wav",
-      "audio": {
-        "v1": "assets/15_testB_mixed-0046_dsp_qwen_specific/v1.wav",
-        "v3": "assets/15_testB_mixed-0046_dsp_qwen_specific/v3.wav",
-        "v2": "assets/15_testB_mixed-0046_dsp_qwen_specific/v2.wav",
-        "v4": "assets/15_testB_mixed-0046_dsp_qwen_specific/input.wav"
-      }
-    },
-    {
-      "id": "testB_mixed-0054_natural_gemini_vague",
-      "instruction": "Make it sound like an absolute emergency.",
-      "source": "assets/17_testB_mixed-0054_natural_gemini_vague/input.wav",
-      "audio": {
-        "v1": "assets/17_testB_mixed-0054_natural_gemini_vague/v1.wav",
-        "v3": "assets/17_testB_mixed-0054_natural_gemini_vague/v3.wav",
-        "v2": "assets/17_testB_mixed-0054_natural_gemini_vague/v2.wav",
-        "v4": "assets/17_testB_mixed-0054_natural_gemini_vague/input.wav"
       }
     }
   ]
