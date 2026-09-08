@@ -1,0 +1,10 @@
+# original audio
+*.zip
+
+# original audio name and mappings
+assets/manifest.csv
+assets/README.txt
+assets/*/sdedit_rms.wav
+
+# real system identity behind the anonymized v1..v4 tokens — never publish
+system-mapping.secret.json

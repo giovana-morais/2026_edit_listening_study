@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listening study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:      #FFFFFF;
+    --panel:      #FFFFFF;
+    --inset:      #F3F3F3;
+    --ink:        #003F5A;
+    --muted:      #6E828C;
+    --line:       #8AB184;
+    --line-soft:  #D9E4D7;
+    --accent:     #DE6600;
+    --accent-soft:#FCF1E7;
+
+    --mono: "IBM Plex Mono", "Lucida Console", ui-monospace, Menlo, monospace;
+
+    --gap: 28px;
+    --radius: 5px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button { font-family: inherit; font-size: inherit; color: inherit; }
+
+  em { font-style: normal; color: var(--accent); }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- header ---------- */
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--paper);
+    border-bottom: 2px solid var(--accent);
+  }
+
+  .topbar-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 16px 24px 12px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .study-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--accent);
+  }
+
+  .trial-count {
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-track {
+    height: 3px;
+    background: transparent;
+    margin-bottom: -3px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--ink);
+    width: 0;
+    transition: width 240ms ease;
+  }
+
+  /* ---------- page ---------- */
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 96px;
+  }
+
+  .instruction-block {
+    margin-bottom: 30px;
+  }
+
+  .instruction-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .instruction-text {
+    font-size: 23px;
+    line-height: 1.35;
+    font-weight: 500;
+    max-width: 24em;
+    margin: 0;
+  }
+
+  /* ---------- source panel ---------- */
+
+  .source {
+    background: var(--inset);
+    border-left: 4px solid var(--ink);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 16px 18px;
+    margin-bottom: var(--gap);
+  }
+
+  .source-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .source-title {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .source-note {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ---------- transport ---------- */
+
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+  }
+
+  .play-btn {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  }
+
+  .play-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .play-btn svg { display: block; }
+  .play-btn .icon-pause { display: none; }
+
+  .play-btn[data-playing="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .play-btn[data-playing="true"] .icon-play { display: none; }
+  .play-btn[data-playing="true"] .icon-pause { display: block; }
+
+  .scrub {
+    flex: 1;
+    height: 3px;
+    background: var(--line-soft);
+    position: relative;
+    border-radius: 2px;
+  }
+
+  .source .scrub { background: #DCDCDC; }
+
+  .scrub-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  .timecode {
+    flex: none;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- rating prompt ---------- */
+
+  .rate-prompt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .rate-prompt span {
+    font-size: 13px;
+    color: var(--muted);
+    flex: none;
+  }
+
+  .rate-prompt::after {
+    content: "";
+    height: 1px;
+    background: var(--line);
+    flex: 1;
+  }
+
+  /* ---------- stimulus panels ---------- */
+
+  .stim {
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-left: 4px solid var(--line);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 18px 20px 20px;
+    margin-bottom: 14px;
+    transition: border-left-color 120ms ease;
+  }
+
+  .stim:nth-of-type(even) { background: var(--inset); }
+
+  .stim[data-playing="true"] {
+    border-left-color: var(--accent);
+  }
+
+  .stim-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .stim-letter {
+    flex: none;
+    width: 26px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .scales {
+    display: grid;
+    gap: 12px;
+    padding-left: 42px;
+  }
+
+  .scale-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .scale-name {
+    flex: none;
+    width: 158px;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .scale-name em {
+    display: block;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .choices {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .anchor {
+    font-size: 11px;
+    color: var(--muted);
+    width: 64px;
+    flex: none;
+  }
+  .anchor.high { text-align: left; }
+  .anchor.low  { text-align: right; }
+
+  .choices input { position: absolute; opacity: 0; pointer-events: none; }
+
+  .choices label {
+    width: 34px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
+    user-select: none;
+  }
+
+  .choices label:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .choices input:checked + label {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .choices input:focus-visible + label {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- footer ---------- */
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  .next-btn {
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: var(--radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 120ms ease;
+  }
+
+  .next-btn:hover:not(:disabled) { background: #C25A00; }
+
+  .next-btn:disabled {
+    background: var(--inset);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+
+  .remaining {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ---------- prose screens ---------- */
+
+  .screen {
+    padding-top: 28px;
+    max-width: 36em;
+  }
+
+  .screen h2 {
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0 0 18px;
+  }
+
+  .screen p {
+    margin: 0 0 16px;
+    max-width: 64ch;
+  }
+
+  .screen .quiet { color: var(--muted); }
+
+  .screen .defn {
+    background: var(--inset);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 16px 18px;
+    margin: 0 0 14px;
+  }
+
+  .screen .defn h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .screen .defn p { margin: 0 0 10px; }
+  .screen .defn p:last-child { margin: 0; }
+
+  .anchors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .anchors b {
+    color: var(--accent);
+    font-weight: 700;
+    margin-right: 5px;
+  }
+
+  .screen .go {
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: var(--radius);
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 120ms ease;
+  }
+
+  .screen .go:hover:not(:disabled) { background: #C25A00; }
+
+  .screen .go:disabled {
+    background: var(--inset);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+
+  /* ---------- headphone check ---------- */
+
+  .tones {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0 8px;
+    flex-wrap: wrap;
+  }
+
+  .tone {
+    flex: 1 1 120px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 18px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 100ms ease, background 100ms ease, color 100ms ease;
+  }
+
+  .tone:hover { border-color: var(--accent); }
+
+  .tone[data-state="playing"] {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .tone[data-state="chosen"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+
+  .tone-name {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .tone-sub {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .tone[data-state="chosen"] .tone-sub { color: #BBD3CE; }
+
+  .round-count {
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- done screen ---------- */
+
+  .done { padding-top: 36px; max-width: 36em; }
+
+  .done h2 {
+    font-size: 23px;
+    font-weight: 700;
+    margin: 0 0 14px;
+  }
+
+  .done p {
+    max-width: 64ch;
+    margin: 0 0 16px;
+  }
+
+  .done .quiet { color: var(--muted); }
+
+  /* ---------- debug ---------- */
+
+  .debug {
+    max-width: 760px;
+    margin: 0 auto 60px;
+    padding: 0 24px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .debug summary {
+    cursor: pointer;
+    padding: 8px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .debug table {
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 8px 0 14px;
+  }
+
+  .debug td { padding: 3px 18px 3px 0; }
+
+  .debug button {
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  @media (max-width: 640px) {
+    body { font-size: 14px; }
+    .instruction-text { font-size: 19px; }
+    .scales { padding-left: 0; }
+    .scale-name { width: 100%; }
+    .anchor { display: none; }
+    .choices { width: 100%; }
+    .choices label { flex: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="study-name">Audio edit listening study</div>
+    <div class="trial-count" id="trialCount">Trial 1 of 10</div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+
+<main id="main"></main>
+
+<!-- <details class="debug"> -->
+<!--   <summary>Session data (remove before running the study)</summary> -->
+<!--   <div id="debugBody"></div> -->
+<!-- </details> -->
+
+<script>
+/* ============================================================
+   CONFIG — edit this block to wire up real audio
+   ============================================================ */
+
+const CONFIG = {
+  itemsPerSession: 1,       // how many trials each listener sees
+  shuffleSystems: true,      // randomise A-D order every trial
+
+  scales: [
+    {
+      id: "quality",
+      name: "Audio quality",
+      hint: "artifacts, clicks, muddiness",
+      low: "Bad",
+      high: "Excellent"
+    },
+    {
+      id: "adherence",
+      name: "Follows the instruction",
+      hint: "and changes nothing else",
+      low: "Not at all",
+      high: "Exactly"
+    }
+  ],
+
+  // Opaque ids/labels on purpose — this file is served as plain static
+  // source on GitHub Pages, so anything here is visible to participants via
+  // view-source or dev tools. The real identity behind each token lives
+  // only in system-mapping.secret.json (gitignored, never published).
+  // ids must match the keys used in each item's `audio` map below.
+  systems: [
+    { id: "v1", label: "Version 1" },
+    { id: "v2", label: "Version 2" },
+    { id: "v3", label: "Version 3" },
+    { id: "v4", label: "Version 4" }
+  ],
+
+  // Practice trial — never scored, never reused in the main set.
+  practiceItems:
+  [
+    {
+      "id": "testB_mixed-0018_natural_gemini_specific",
+      "instruction": "Make the insect sound like a much larger, heavier bug by drawing out the wingbeats so you can hear each individual flap instead of a fast buzz.",
+      "source": "assets/05_testB_mixed-0018_natural_gemini_specific/input.wav",
+      "audio": {
+        "v1": "assets/05_testB_mixed-0018_natural_gemini_specific/v1.wav",
+        "v3": "assets/05_testB_mixed-0018_natural_gemini_specific/v3.wav",
+        "v2": "assets/05_testB_mixed-0018_natural_gemini_specific/v2.wav",
+        "v4": "assets/05_testB_mixed-0018_natural_gemini_specific/v4.wav"
+      }
+    }
+  ],
+
+  screeningRounds: 6,       // headphone check trials
+  screeningPassMark: 5,     // correct answers needed to continue
+  breakAfter: 5,            // show a pause screen after this many trials
+
+  // `source` is the unedited original clip; `audio` maps each system id
+  // to its edited WAV, both as paths relative to this HTML file.
+  items:
+  [
+    {
+      "id": "testB_mixed-0004_dsp_qwen_vague",
+      "instruction": "Distant, submerged vibe",
+      "source": "assets/01_testB_mixed-0004_dsp_qwen_vague/input.wav",
+      "audio": {
+        "v1": "assets/01_testB_mixed-0004_dsp_qwen_vague/v1.wav",
+        "v3": "assets/01_testB_mixed-0004_dsp_qwen_vague/v3.wav",
+        "v2": "assets/01_testB_mixed-0004_dsp_qwen_vague/v2.wav",
+        "v4": "assets/01_testB_mixed-0004_dsp_qwen_vague/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0008_natural_qwen_specific",
+      "instruction": "Make the creaking sound much heavier and deeper, like the massive wooden timbers of a giant ship groaning loudly.",
+      "source": "assets/02_testB_mixed-0008_natural_qwen_specific/input.wav",
+      "audio": {
+        "v1": "assets/02_testB_mixed-0008_natural_qwen_specific/v1.wav",
+        "v3": "assets/02_testB_mixed-0008_natural_qwen_specific/v3.wav",
+        "v2": "assets/02_testB_mixed-0008_natural_qwen_specific/v2.wav",
+        "v4": "assets/02_testB_mixed-0008_natural_qwen_specific/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0016_dsp_qwen_vague",
+      "instruction": "Give it a distant, filtered sound.",
+      "source": "assets/04_testB_mixed-0016_dsp_qwen_vague/input.wav",
+      "audio": {
+        "v1": "assets/04_testB_mixed-0016_dsp_qwen_vague/v1.wav",
+        "v3": "assets/04_testB_mixed-0016_dsp_qwen_vague/v3.wav",
+        "v2": "assets/04_testB_mixed-0016_dsp_qwen_vague/v2.wav",
+        "v4": "assets/04_testB_mixed-0016_dsp_qwen_vague/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0020_dsp_gemini_specific",
+      "instruction": "Cut the low-end rumble with a high-pass filter to shift the texture from heavy rocks to lighter, thinner gravel.",
+      "source": "assets/06_testB_mixed-0020_dsp_gemini_specific/input.wav",
+      "audio": {
+        "v1": "assets/06_testB_mixed-0020_dsp_gemini_specific/v1.wav",
+        "v3": "assets/06_testB_mixed-0020_dsp_gemini_specific/v3.wav",
+        "v2": "assets/06_testB_mixed-0020_dsp_gemini_specific/v2.wav",
+        "v4": "assets/06_testB_mixed-0020_dsp_gemini_specific/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0028_natural_qwen_specific",
+      "instruction": "I want the shattering to sound a bit slower and more drawn out",
+      "source": "assets/09_testB_mixed-0028_natural_qwen_specific/input.wav",
+      "audio": {
+        "v1": "assets/09_testB_mixed-0028_natural_qwen_specific/v1.wav",
+        "v3": "assets/09_testB_mixed-0028_natural_qwen_specific/v3.wav",
+        "v2": "assets/09_testB_mixed-0028_natural_qwen_specific/v2.wav",
+        "v4": "assets/09_testB_mixed-0028_natural_qwen_specific/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0032_natural_qwen_specific",
+      "instruction": "Make the farting noise sound more intense and aggressive, like the bag is being squeezed much harder to push the air out.",
+      "source": "assets/11_testB_mixed-0032_natural_qwen_specific/input.wav",
+      "audio": {
+        "v1": "assets/11_testB_mixed-0032_natural_qwen_specific/v1.wav",
+        "v3": "assets/11_testB_mixed-0032_natural_qwen_specific/v3.wav",
+        "v2": "assets/11_testB_mixed-0032_natural_qwen_specific/v2.wav",
+        "v4": "assets/11_testB_mixed-0032_natural_qwen_specific/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0044_dsp_qwen_vague",
+      "instruction": "Make the beep wobbly and psychedelic.",
+      "source": "assets/14_testB_mixed-0044_dsp_qwen_vague/input.wav",
+      "audio": {
+        "v1": "assets/14_testB_mixed-0044_dsp_qwen_vague/v1.wav",
+        "v3": "assets/14_testB_mixed-0044_dsp_qwen_vague/v3.wav",
+        "v2": "assets/14_testB_mixed-0044_dsp_qwen_vague/v2.wav",
+        "v4": "assets/14_testB_mixed-0044_dsp_qwen_vague/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0056_dsp_qwen_vague",
+      "instruction": "More aggressive and immediate impact.",
+      "source": "assets/18_testB_mixed-0056_dsp_qwen_vague/input.wav",
+      "audio": {
+        "v1": "assets/18_testB_mixed-0056_dsp_qwen_vague/v1.wav",
+        "v3": "assets/18_testB_mixed-0056_dsp_qwen_vague/v3.wav",
+        "v2": "assets/18_testB_mixed-0056_dsp_qwen_vague/v2.wav",
+        "v4": "assets/18_testB_mixed-0056_dsp_qwen_vague/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0080_custom_human_concise",
+      "instruction": "I want this to be splashier",
+      "source": "assets/20_testB_mixed-0080_custom_human_concise/input.wav",
+      "audio": {
+        "v1": "assets/20_testB_mixed-0080_custom_human_concise/v1.wav",
+        "v3": "assets/20_testB_mixed-0080_custom_human_concise/v3.wav",
+        "v2": "assets/20_testB_mixed-0080_custom_human_concise/v2.wav",
+        "v4": "assets/20_testB_mixed-0080_custom_human_concise/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0013_natural_qwen_vague",
+      "instruction": "Make the strike sound a lot more aggressive.",
+      "source": "assets/03_testB_mixed-0013_natural_qwen_vague/input.wav",
+      "audio": {
+        "v1": "assets/03_testB_mixed-0013_natural_qwen_vague/v1.wav",
+        "v3": "assets/03_testB_mixed-0013_natural_qwen_vague/v3.wav",
+        "v2": "assets/03_testB_mixed-0013_natural_qwen_vague/v2.wav",
+        "v4": "assets/03_testB_mixed-0013_natural_qwen_vague/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0021_dsp_qwen_vague",
+      "instruction": "Give the chomps more bite and snap",
+      "source": "assets/07_testB_mixed-0021_dsp_qwen_vague/input.wav",
+      "audio": {
+        "v1": "assets/07_testB_mixed-0021_dsp_qwen_vague/v1.wav",
+        "v3": "assets/07_testB_mixed-0021_dsp_qwen_vague/v3.wav",
+        "v2": "assets/07_testB_mixed-0021_dsp_qwen_vague/v2.wav",
+        "v4": "assets/07_testB_mixed-0021_dsp_qwen_vague/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0041_natural_gemini_specific",
+      "instruction": "Make the impacts sound firmer and slightly bouncier, like the jar is being struck by a solid rubber mallet instead of a soft one.",
+      "source": "assets/13_testB_mixed-0041_natural_gemini_specific/input.wav",
+      "audio": {
+        "v1": "assets/13_testB_mixed-0041_natural_gemini_specific/v1.wav",
+        "v3": "assets/13_testB_mixed-0041_natural_gemini_specific/v3.wav",
+        "v2": "assets/13_testB_mixed-0041_natural_gemini_specific/v2.wav",
+        "v4": "assets/13_testB_mixed-0041_natural_gemini_specific/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0038_natural_qwen_specific",
+      "instruction": "Make the hard drive's clicking and spinning happen at a quicker pace, like it's working overtime and failing faster.",
+      "source": "assets/12_testB_mixed-0038_natural_qwen_specific/input.wav",
+      "audio": {
+        "v1": "assets/12_testB_mixed-0038_natural_qwen_specific/v1.wav",
+        "v3": "assets/12_testB_mixed-0038_natural_qwen_specific/v3.wav",
+        "v2": "assets/12_testB_mixed-0038_natural_qwen_specific/v2.wav",
+        "v4": "assets/12_testB_mixed-0038_natural_qwen_specific/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0046_dsp_qwen_specific",
+      "instruction": "Add a large hall reverb with a long decay time to create a cavernous, echoing impression of the pouring oil.",
+      "source": "assets/15_testB_mixed-0046_dsp_qwen_specific/input.wav",
+      "audio": {
+        "v1": "assets/15_testB_mixed-0046_dsp_qwen_specific/v1.wav",
+        "v3": "assets/15_testB_mixed-0046_dsp_qwen_specific/v3.wav",
+        "v2": "assets/15_testB_mixed-0046_dsp_qwen_specific/v2.wav",
+        "v4": "assets/15_testB_mixed-0046_dsp_qwen_specific/v4.wav"
+      }
+    },
+    {
+      "id": "testB_mixed-0054_natural_gemini_vague",
+      "instruction": "Make it sound like an absolute emergency.",
+      "source": "assets/17_testB_mixed-0054_natural_gemini_vague/input.wav",
+      "audio": {
+        "v1": "assets/17_testB_mixed-0054_natural_gemini_vague/v1.wav",
+        "v3": "assets/17_testB_mixed-0054_natural_gemini_vague/v3.wav",
+        "v2": "assets/17_testB_mixed-0054_natural_gemini_vague/v2.wav",
+        "v4": "assets/17_testB_mixed-0054_natural_gemini_vague/v4.wav"
+      }
+    }
+  ]
+};
+
+/* ============================================================
+   Audio — plays real WAV files (item.source / item.audio[systemId])
+   ============================================================ */
+
+let ctx = null; // shared AudioContext, used by the headphone-check tones below
+
+const audio = {
+  current: null,
+
+  // src: URL of the WAV to play (relative to this HTML file).
+  // onTick(currentTime, duration) fires on load and on every timeupdate.
+  // onEnd() fires when playback finishes or is stopped.
+  play(src, onTick, onEnd) {
+    this.stop();
+
+    const el = new Audio(src);
+    const tick = () => onTick(el.currentTime, el.duration || 0);
+
+    el.addEventListener("loadedmetadata", tick);
+    el.addEventListener("timeupdate", tick);
+    el.addEventListener("ended", () => {
+      this.current = null;
+      onEnd();
+    });
+    el.addEventListener("error", () => {
+      console.error("Could not load audio:", src);
+      this.current = null;
+      onEnd();
+    });
+
+    this.current = { el, onEnd };
+    el.play().catch(err => {
+      console.error("Playback failed:", src, err);
+      this.current = null;
+      onEnd();
+    });
+  },
+
+  stop() {
+    if (!this.current) return;
+    const c = this.current;
+    this.current = null;
+    c.el.pause();
+    c.el.currentTime = 0;
+    c.onEnd();
+  }
+};
+
+/* ============================================================
+   Session state
+   ============================================================ */
+
+const LETTERS = ["A", "B", "C", "D", "E", "F"];
+
+const shuffle = arr => {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+const session = {
+  mainItems: shuffle(CONFIG.items).slice(0, CONFIG.itemsPerSession),
+  items: [],
+  index: 0,
+  practice: false,
+  results: [],
+  screening: { correct: 0, answers: [] },
+  startedAt: Date.now()
+};
+
+let trial = null;
+
+function buildTrial() {
+  const item = session.items[session.index];
+  const order = CONFIG.shuffleSystems ? shuffle(CONFIG.systems) : CONFIG.systems.slice();
+  trial = {
+    item,
+    order,
+    ratings: {},
+    plays: {},
+    shownAt: Date.now()
+  };
+  order.forEach(s => { trial.plays[s.id] = 0; });
+}
+
+const fmt = s => {
+  const m = Math.floor(s / 60);
+  const r = Math.floor(s % 60);
+  return `${m}:${String(r).padStart(2, "0")}`;
+};
+
+const ICONS = `
+  <svg class="icon-play" width="12" height="14" viewBox="0 0 12 14" fill="currentColor"><path d="M1 1.2v11.6a.6.6 0 0 0 .93.5l9-5.8a.6.6 0 0 0 0-1L1.93.7A.6.6 0 0 0 1 1.2Z"/></svg>
+  <svg class="icon-pause" width="12" height="14" viewBox="0 0 12 14" fill="currentColor"><rect x="1" y="1" width="3.4" height="12" rx=".6"/><rect x="7.6" y="1" width="3.4" height="12" rx=".6"/></svg>
+`;
+
+/* ============================================================
+   Render
+   ============================================================ */
+
+function setHeader(text, pct) {
+  document.getElementById("trialCount").textContent = text;
+  document.getElementById("progressFill").style.width = `${pct}%`;
+}
+
+function renderTrial() {
+  const total = session.items.length;
+  setHeader(
+    session.practice ? "Practice" : `Trial ${session.index + 1} of ${total}`,
+    session.practice ? 0 : (session.index / total) * 100
+  );
+
+  const scaleRows = sys => CONFIG.scales.map(sc => {
+    const name = `${sys.uid}-${sc.id}`;
+    const buttons = [1, 2, 3, 4, 5].map(v => `
+      <input type="radio" id="${name}-${v}" name="${name}" value="${v}"
+             data-sys="${sys.id}" data-scale="${sc.id}">
+      <label for="${name}-${v}">${v}</label>`).join("");
+    return `
+      <div class="scale-row">
+        <div class="scale-name">${sc.name}<em>${sc.hint}</em></div>
+        <div class="choices">
+          <span class="anchor low">${sc.low}</span>
+          ${buttons}
+          <span class="anchor high">${sc.high}</span>
+        </div>
+      </div>`;
+  }).join("");
+
+  const stimuli = trial.order.map((sys, i) => {
+    sys.uid = `${trial.item.id}-${i}`;
+    return `
+      <section class="stim" data-sys="${sys.id}" data-playing="false">
+        <div class="stim-head">
+          <div class="stim-letter">${LETTERS[i]}</div>
+          <div class="transport">
+            <button class="play-btn" data-sys="${sys.id}" data-playing="false"
+                    aria-label="Play version ${LETTERS[i]}">${ICONS}</button>
+            <div class="scrub"><div class="scrub-fill"></div></div>
+            <div class="timecode">0:00 / --:--</div>
+          </div>
+        </div>
+        <div class="scales">${scaleRows(sys)}</div>
+      </section>`;
+  }).join("");
+
+  document.getElementById("main").innerHTML = `
+    <div class="instruction-block">
+      <div class="instruction-label">The edit that was requested</div>
+      <p class="instruction-text">${trial.item.instruction}</p>
+    </div>
+
+    <div class="source" data-sys="__source" data-playing="false">
+      <div class="source-heading">
+        <div class="source-title">Original audio</div>
+        <div class="source-note">for reference — you are not rating this</div>
+      </div>
+      <div class="transport">
+        <button class="play-btn" data-sys="__source" data-playing="false"
+                aria-label="Play the original audio">${ICONS}</button>
+        <div class="scrub"><div class="scrub-fill"></div></div>
+        <div class="timecode">0:00 / --:--</div>
+      </div>
+    </div>
+
+    <div class="rate-prompt"><span>Rate each version</span></div>
+
+    ${stimuli}
+
+    <div class="actions">
+      <button class="next-btn" id="nextBtn" disabled>Next trial</button>
+      <span class="remaining" id="remaining"></span>
+    </div>
+  `;
+
+  bindTrial();
+  updateRemaining();
+  renderDebug();
+}
+
+function panelFor(sysId) {
+  return document.querySelector(`.stim[data-sys="${sysId}"], .source[data-sys="${sysId}"]`);
+}
+
+function bindTrial() {
+  document.querySelectorAll(".play-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const sysId = btn.dataset.sys;
+      const wasPlaying = btn.dataset.playing === "true";
+      audio.stop();
+      if (wasPlaying) return;
+
+      if (trial.plays[sysId] !== undefined) trial.plays[sysId]++;
+
+      const panel = panelFor(sysId);
+      const fill = panel.querySelector(".scrub-fill");
+      const time = panel.querySelector(".timecode");
+      btn.dataset.playing = "true";
+      panel.dataset.playing = "true";
+
+      const src = sysId === "__source" ? trial.item.source : trial.item.audio[sysId];
+
+      audio.play(src,
+        (cur, dur) => {
+          fill.style.width = dur ? `${(cur / dur) * 100}%` : "0%";
+          time.textContent = `${fmt(cur)} / ${dur ? fmt(dur) : "--:--"}`;
+        },
+        () => {
+          btn.dataset.playing = "false";
+          panel.dataset.playing = "false";
+          fill.style.width = "0";
+          time.textContent = "0:00 / --:--";
+        }
+      );
+    });
+  });
+
+  document.querySelectorAll('.choices input').forEach(input => {
+    input.addEventListener("change", () => {
+      const { sys, scale } = input.dataset;
+      trial.ratings[sys] = trial.ratings[sys] || {};
+      trial.ratings[sys][scale] = Number(input.value);
+      updateRemaining();
+      renderDebug();
+    });
+  });
+
+  document.getElementById("nextBtn").addEventListener("click", nextTrial);
+}
+
+function ratingsNeeded() {
+  return trial.order.length * CONFIG.scales.length;
+}
+
+function ratingsGiven() {
+  return Object.values(trial.ratings).reduce((n, r) => n + Object.keys(r).length, 0);
+}
+
+function updateRemaining() {
+  const left = ratingsNeeded() - ratingsGiven();
+  document.getElementById("nextBtn").disabled = left > 0;
+  document.getElementById("remaining").textContent =
+    left > 0 ? `${left} rating${left === 1 ? "" : "s"} still to give` : "";
+}
+
+function nextTrial() {
+  audio.stop();
+  window.scrollTo({ top: 0, behavior: "instant" });
+
+  if (session.practice) {
+    session.index++;
+    if (session.index >= session.items.length) return renderPracticeEnd();
+    buildTrial();
+    return renderTrial();
+  }
+
+  trial.order.forEach(sys => {
+    session.results.push({
+      item: trial.item.id,
+      instruction: trial.item.instruction,
+      system: sys.id,
+      position: LETTERS[trial.order.indexOf(sys)],
+      plays: trial.plays[sys.id],
+      ...trial.ratings[sys.id],
+      secondsOnTrial: Math.round((Date.now() - trial.shownAt) / 1000)
+    });
+  });
+
+  session.index++;
+
+  if (session.index >= session.items.length) return renderDone();
+  <!-- if (session.index === CONFIG.breakAfter) return renderBreak(); -->
+
+  buildTrial();
+  renderTrial();
+}
+
+function renderDone() {
+  audio.stop();
+  setHeader("Complete", 100);
+  const mins = Math.round((Date.now() - session.startedAt) / 60000);
+  document.getElementById("main").innerHTML = `
+    <div class="done">
+      <h2>That's all, thanks!</h2>
+      <p>You rated ${session.items.length} edits across
+         ${CONFIG.systems.length} versions each, in about ${mins} minute${mins === 1 ? "" : "s"}.</p>
+      <p class="quiet">You can close this tab.</p>
+      <div class="actions">
+        <button class="next-btn" id="emailBtn">Email results</button>
+        <button class="next-btn" id="dl">Download results as CSV</button>
+      </div>
+      <p class="quiet">Emailing downloads the CSV and opens your email app
+         with the address filled in — just attach the downloaded file
+         before sending.</p>
+    </div>`;
+  document.getElementById("dl").addEventListener("click", downloadCSV);
+  document.getElementById("emailBtn").addEventListener("click", emailResults);
+  renderDebug();
+}
+
+/* ============================================================
+   Pre-study flow
+   ============================================================ */
+
+function screen(html) {
+  document.getElementById("main").innerHTML = `<div class="screen">${html}</div>`;
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function renderIntro() {
+  setHeader("", 0);
+  screen(`
+    <h2>Rating edited music</h2>
+    <p>You'll hear short music clips that have been edited in some way, and rate how
+       well each edit turned out. It takes about 25 minutes.</p>
+    <p>You need headphones and a quiet room. Please don't use laptop speakers — the
+       differences you're judging are often subtle, and speakers will hide them.</p>
+    <p>Your ratings are anonymous and will only be reported as aggregate numbers.
+       You can stop at any point by closing the tab.</p>
+    <p class="quiet">Thanks for your time.</p>
+    <button class="go" id="go">Start</button>
+  `);
+  document.getElementById("go").addEventListener("click", renderCalibration);
+}
+
+function renderCalibration() {
+  setHeader("Setup", 0);
+  screen(`
+    <h2>Set your volume</h2>
+    <p>Play the clip below and turn your volume up until it's comfortable — loud enough
+       to hear detail, not so loud that it's harsh.</p>
+    <div class="source" data-sys="__cal" data-playing="false">
+      <div class="transport">
+        <button class="play-btn" data-sys="__cal" data-playing="false"
+                aria-label="Play the calibration clip">${ICONS}</button>
+        <div class="scrub"><div class="scrub-fill"></div></div>
+        <div class="timecode">0:00 / --:--</div>
+      </div>
+    </div>
+    <p>Leave your volume there for the rest of the study. Changing it later
+       makes your ratings harder to compare.</p>
+    <button class="go" id="go" disabled>Continue</button>
+  `);
+
+  const btn = document.querySelector(".play-btn");
+  const panel = document.querySelector('.source[data-sys="__cal"]');
+  const fill = panel.querySelector(".scrub-fill");
+  const time = panel.querySelector(".timecode");
+  const go = document.getElementById("go");
+
+  btn.addEventListener("click", () => {
+    const playing = btn.dataset.playing === "true";
+    audio.stop();
+    if (playing) return;
+    btn.dataset.playing = "true";
+    panel.dataset.playing = "true";
+    go.disabled = false;
+    audio.play(CONFIG.practiceItems[0].source,
+      (cur, dur) => {
+        fill.style.width = dur ? `${(cur / dur) * 100}%` : "0%";
+        time.textContent = `${fmt(cur)} / ${dur ? fmt(dur) : "--:--"}`;
+      },
+      () => {
+        btn.dataset.playing = "false";
+        panel.dataset.playing = "false";
+        fill.style.width = "0";
+        time.textContent = "0:00 / --:--";
+      }
+    );
+  });
+
+  go.addEventListener("click", () => { audio.stop(); renderScreening(0); });
+}
+
+/* Antiphase headphone check (after Milne et al.). Three tones: two in phase,
+   one 6 dB quieter, one antiphase. Over headphones the quiet one is obvious.
+   Over speakers the antiphase tone partly cancels and is picked instead. */
+function playTone(kind) {
+  ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === "suspended") ctx.resume();
+
+  const dur = 1.1, t0 = ctx.currentTime;
+  const merger = ctx.createChannelMerger(2);
+  merger.connect(ctx.destination);
+
+  [0, 1].forEach(ch => {
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = 200;
+    const g = ctx.createGain();
+    const level = kind === "quiet" ? 0.09 : 0.18;
+    g.gain.value = 0.0001;
+    g.gain.exponentialRampToValueAtTime(level, t0 + 0.03);
+    g.gain.setValueAtTime(level, t0 + dur - 0.08);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    if (kind === "antiphase" && ch === 1) {
+      const inv = ctx.createGain();
+      inv.gain.value = -1;
+      osc.connect(inv).connect(g);
+    } else {
+      osc.connect(g);
+    }
+    g.connect(merger, 0, ch);
+    osc.start(t0);
+    osc.stop(t0 + dur);
+  });
+  return dur * 1000;
+}
+
+function renderScreening(round) {
+  setHeader("Setup", 0);
+
+  if (round >= CONFIG.screeningRounds) {
+    <!-- if (session.screening.correct < CONFIG.screeningPassMark) { -->
+    <!--   return screen(` -->
+    <!--     <h2>Let's check your setup</h2> -->
+    <!--     <p>The tones didn't come through the way they should, which usually means the -->
+    <!--        audio isn't playing over headphones. Plug in headphones, make sure they're -->
+    <!--        selected as the output device, and try the check again.</p> -->
+    <!--     <button class="go" id="go">Try again</button> -->
+    <!--   `), document.getElementById("go") -->
+    <!--          .addEventListener("click", () => { -->
+    <!--            session.screening = { correct: 0, answers: [] }; -->
+    <!--            renderScreening(0); -->
+    <!--          }); -->
+    <!-- } -->
+    return renderTaskInstructions();
+  }
+
+  const kinds = shuffle(["normal", "quiet", "antiphase"]);
+  screen(`
+    <h2>Quick check</h2>
+    <p>You'll hear three tones. Choose the quietest one.</p>
+    <div class="tones">
+      ${kinds.map((k, i) => `
+        <button class="tone" data-kind="${k}" data-state="idle">
+          <span class="tone-name">${i + 1}</span>
+          <span class="tone-sub">play</span>
+        </button>`).join("")}
+    </div>
+    <p class="round-count">Round ${round + 1} of ${CONFIG.screeningRounds}</p>
+    <button class="go" id="go" disabled>Continue</button>
+  `);
+
+  const go = document.getElementById("go");
+  let chosen = null;
+
+  document.querySelectorAll(".tone").forEach(el => {
+    el.addEventListener("click", () => {
+      if (el.dataset.state === "chosen") return;
+      document.querySelectorAll(".tone").forEach(o => {
+        if (o.dataset.state !== "chosen") o.dataset.state = "idle";
+      });
+      const wasChosen = chosen;
+      if (wasChosen && wasChosen !== el) wasChosen.dataset.state = "idle";
+      el.dataset.state = "playing";
+      const ms = playTone(el.dataset.kind);
+      setTimeout(() => {
+        if (el.dataset.state === "playing") el.dataset.state = "chosen";
+        chosen = el;
+        el.querySelector(".tone-sub").textContent = "quietest";
+        go.disabled = false;
+      }, ms);
+    });
+  });
+
+  go.addEventListener("click", () => {
+    const answer = chosen ? chosen.dataset.kind : null;
+    session.screening.answers.push(answer);
+    if (answer === "quiet") session.screening.correct++;
+    renderScreening(round + 1);
+  });
+}
+
+function renderTaskInstructions() {
+  setHeader("Setup", 0);
+  const anchors = (...words) =>
+    `<div class="anchors">${words.map((w, i) =>
+      `<span><b>${i + 1}</b>${w}</span>`).join("")}</div>`;
+
+  screen(`
+    <h2>Your task</h2>
+    <p>Each round will show you an input audio, an edit instruction, 
+        for example <em>"make it sound like it is inside a big room"</em>
+        and ${CONFIG.systems.length} edited versions of it, labelled
+       A to ${LETTERS[CONFIG.systems.length - 1]}.</p>
+    <p>Rate every version on two things.</p>
+
+    <div class="defn">
+      <h3>Audio quality</h3>
+      <p>How clean does it sound on its own terms? Ignore whether
+         the edit itself was any good, this is only about how it sounds.</p>
+      ${anchors("Bad", "Poor", "Fair", "Good", "Excellent")}
+    </div>
+
+    <div class="defn">
+      <h3>Follows the instruction</h3>
+      <p>Was the change that was asked for actually made? Play the original as often as
+         you need to compare.</p>
+      ${anchors("Not at all", "Barely", "Partly", "Mostly", "Exactly")}
+    </div>
+
+    <p>The versions come from different sources and vary a lot. Some may be very good,
+       some may be barely changed from the original. Use the whole scale: if something
+       deserves a 1, give it a 1.</p>
+    <!-- <p>Trust your first impression. There are no right answers, and you don't need any -->
+    <!--    musical training to do this.</p> -->
+    <button class="go" id="go">Continue</button>
+  `);
+  document.getElementById("go").addEventListener("click", startPractice);
+}
+
+function startPractice() {
+  session.practice = true;
+  session.items = CONFIG.practiceItems;
+  session.index = 0;
+  buildTrial();
+  renderTrial();
+}
+
+function renderPracticeEnd() {
+  setHeader("", 0);
+  screen(`
+    <h2>Good! That's the format.</h2>
+    <p>The real rounds start now. From here on your ratings are recorded, and there
+       are ${session.mainItems.length} of them.</p>
+    <button class="go" id="go">Start</button>
+  `);
+  document.getElementById("go").addEventListener("click", () => {
+    session.practice = false;
+    session.items = session.mainItems;
+    session.index = 0;
+    session.startedAt = Date.now();
+    buildTrial();
+    renderTrial();
+  });
+}
+
+function renderBreak() {
+  audio.stop();
+  setHeader(`Trial ${session.index} of ${session.items.length}`,
+            (session.index / session.items.length) * 100);
+  screen(`
+    <h2>Halfway</h2>
+    <p>Take a moment if you'd like. Your progress is saved — carry on when you're ready.</p>
+    <p class="quiet">Please don't change your volume.</p>
+    <button class="go" id="go">Continue</button>
+  `);
+  document.getElementById("go").addEventListener("click", () => {
+    buildTrial();
+    renderTrial();
+  });
+}
+
+renderIntro();
+
+function buildCSVString() {
+  const cols = ["item", "system", "position", "plays", "secondsOnTrial",
+                ...CONFIG.scales.map(s => s.id)];
+  const rows = [cols.join(",")].concat(
+    session.results.map(r => cols.map(c => r[c] ?? "").join(","))
+  );
+  return rows.join("\n");
+}
+
+function downloadCSV() {
+  const blob = new Blob([buildCSVString()], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `listening-study-${Date.now()}.csv`;
+  a.click();
+}
+
+// mailto: can't attach a file, so this downloads the CSV (same file the
+// Download button produces) and then opens the participant's own email
+// client with the address/subject/body prefilled — they still need to
+// attach the file that just downloaded before hitting send.
+function emailResults() {
+  downloadCSV();
+  const to = "giovana.morais@nyu.edu";
+  const subject = encodeURIComponent("Listening study results");
+  const body = encodeURIComponent(
+    "Hi,\n\n" +
+    "My results CSV should have just downloaded to this device " +
+    "(a file named listening-study-<numbers>.csv) — please attach it here " +
+    "before sending.\n\nThanks!"
+  );
+  window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+}
+
+function renderDebug() {
+  const body = document.getElementById("debugBody");
+  if (!body) return;
+  const map = trial && session.index < session.items.length
+    ? `<table>${trial.order.map((s, i) => `
+        <tr><td>${LETTERS[i]}</td><td>${s.label}</td>
+        <td>${trial.plays[s.id]} play${trial.plays[s.id] === 1 ? "" : "s"}</td></tr>`).join("")}</table>`
+    : "";
+  body.innerHTML = `
+    <p>This panel exists so you can check the randomisation while iterating.
+       Listeners must never see it.</p>
+    ${map}
+    <button onclick="downloadCSV()">Download results so far</button>`;
+}
+</script>
+</body>
+</html>
