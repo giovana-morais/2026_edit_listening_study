@@ -1096,8 +1096,8 @@ function screen(html) {
 function renderIntro() {
   setHeader("", 0);
   screen(`
-    <h2>Rating edited music</h2>
-    <p>You'll hear short music clips that have been edited in some way, and rate how
+    <h2>Rating edited audio</h2>
+    <p>You'll hear short audio clips that have been edited in some way, and rate how
        well each edit turned out. It takes around 20 minutes to complete.</p>
     <p>You need headphones and a quiet room. Please don't use laptop speakers — the
        differences you're judging are often subtle, and speakers will hide them.</p>
@@ -1289,8 +1289,6 @@ function renderTaskInstructions() {
     <p>The versions come from different sources and vary a lot. Some may be very good,
        some may be barely changed from the original. Use the whole scale: if something
        deserves a 1, give it a 1.</p>
-    <!-- <p>Trust your first impression. There are no right answers, and you don't need any -->
-    <!--    musical training to do this.</p> -->
     <button class="go" id="go">Continue</button>
   `);
   document.getElementById("go").addEventListener("click", startPractice);
