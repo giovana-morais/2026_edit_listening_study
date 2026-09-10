@@ -1098,12 +1098,11 @@ function renderIntro() {
   screen(`
     <h2>Rating edited music</h2>
     <p>You'll hear short music clips that have been edited in some way, and rate how
-       well each edit turned out. It takes about 25 minutes.</p>
+       well each edit turned out. It takes around 20 minutes to complete.</p>
     <p>You need headphones and a quiet room. Please don't use laptop speakers — the
        differences you're judging are often subtle, and speakers will hide them.</p>
-    <p>Your ratings are anonymous and will only be reported as aggregate numbers.
-       You can stop at any point by closing the tab.</p>
-    <p class="quiet">Thanks for your time.</p>
+    <p>Your ratings are anonymous and will only be reported as aggregate numbers.</p>
+    <p class="quiet">Thanks for your time!</p>
     <button class="go" id="go">Start</button>
   `);
   document.getElementById("go").addEventListener("click", renderCalibration);
