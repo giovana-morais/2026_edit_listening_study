@@ -1067,17 +1067,16 @@ function renderDone() {
   const mins = Math.round((Date.now() - session.startedAt) / 60000);
   document.getElementById("main").innerHTML = `
     <div class="done">
-      <h2>That's all, thanks!</h2>
       <p>You rated ${session.items.length} edits across
          ${CONFIG.systems.length} versions each, in about ${mins} minute${mins === 1 ? "" : "s"}.</p>
-      <p class="quiet">You can close this tab.</p>
+      <p class="quiet">Emailing downloads the CSV and opens your email app
+         with the address filled in. Please make sure to attach the downloaded file
+         before sending.</p>
       <div class="actions">
         <button class="next-btn" id="emailBtn">Email results</button>
         <button class="next-btn" id="dl">Download results as CSV</button>
       </div>
-      <p class="quiet">Emailing downloads the CSV and opens your email app
-         with the address filled in — just attach the downloaded file
-         before sending.</p>
+      <h2>That's all, many thanks!</h2>
     </div>`;
   document.getElementById("dl").addEventListener("click", downloadCSV);
   document.getElementById("emailBtn").addEventListener("click", emailResults);
