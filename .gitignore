@@ -12,3 +12,4 @@ system-mapping.secret.json
 
 # raw participant exports and decoded aggregate results — private until published
 scripts/*.csv
+listening-test-v4/

@@ -1067,17 +1067,16 @@ function renderDone() {
   const mins = Math.round((Date.now() - session.startedAt) / 60000);
   document.getElementById("main").innerHTML = `
     <div class="done">
-      <h2>That's all, thanks!</h2>
       <p>You rated ${session.items.length} edits across
          ${CONFIG.systems.length} versions each, in about ${mins} minute${mins === 1 ? "" : "s"}.</p>
-      <p class="quiet">You can close this tab.</p>
+      <p class="quiet">Emailing downloads the CSV and opens your email app
+         with the address filled in. Please make sure to attach the downloaded file
+         before sending.</p>
       <div class="actions">
         <button class="next-btn" id="emailBtn">Email results</button>
         <button class="next-btn" id="dl">Download results as CSV</button>
       </div>
-      <p class="quiet">Emailing downloads the CSV and opens your email app
-         with the address filled in — just attach the downloaded file
-         before sending.</p>
+      <h2>That's all, many thanks!</h2>
     </div>`;
   document.getElementById("dl").addEventListener("click", downloadCSV);
   document.getElementById("emailBtn").addEventListener("click", emailResults);
@@ -1096,14 +1095,13 @@ function screen(html) {
 function renderIntro() {
   setHeader("", 0);
   screen(`
-    <h2>Rating edited music</h2>
-    <p>You'll hear short music clips that have been edited in some way, and rate how
-       well each edit turned out. It takes about 25 minutes.</p>
-    <p>You need headphones and a quiet room. Please don't use laptop speakers — the
+    <h2>Rating edited audio</h2>
+    <p>You'll hear short audio clips that have been edited in some way, and rate how
+       well each edit turned out. It takes around 20 minutes to complete.</p>
+    <p>You need headphones and a quiet room. Please don't use laptop speakers as the
        differences you're judging are often subtle, and speakers will hide them.</p>
-    <p>Your ratings are anonymous and will only be reported as aggregate numbers.
-       You can stop at any point by closing the tab.</p>
-    <p class="quiet">Thanks for your time.</p>
+    <p>Your ratings are anonymous and will only be reported as aggregate numbers.</p>
+    <p class="quiet">Thanks for your time!</p>
     <button class="go" id="go">Start</button>
   `);
   document.getElementById("go").addEventListener("click", renderCalibration);
@@ -1290,8 +1288,6 @@ function renderTaskInstructions() {
     <p>The versions come from different sources and vary a lot. Some may be very good,
        some may be barely changed from the original. Use the whole scale: if something
        deserves a 1, give it a 1.</p>
-    <!-- <p>Trust your first impression. There are no right answers, and you don't need any -->
-    <!--    musical training to do this.</p> -->
     <button class="go" id="go">Continue</button>
   `);
   document.getElementById("go").addEventListener("click", startPractice);
