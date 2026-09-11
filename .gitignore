@@ -9,3 +9,6 @@ assets/*/v4.wav
 
 # real system identity behind the anonymized v1..v4 tokens — never publish
 system-mapping.secret.json
+
+# raw participant exports and decoded aggregate results — private until published
+scripts/*.csv
