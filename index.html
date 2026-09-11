@@ -1069,11 +1069,12 @@ function renderDone() {
     <div class="done">
       <p>You rated ${session.items.length} edits across
          ${CONFIG.systems.length} versions each, in about ${mins} minute${mins === 1 ? "" : "s"}.</p>
-      <p class="quiet">Emailing downloads the CSV and opens your email app
-         with the address filled in. Please make sure to attach the downloaded file
+        <p>Your results are not submitted yet!</p>
+      <p class="quiet">Please download the CSV and email it to giovana.morais@nyu.edu. Please make sure to attach the downloaded file
+        <br>
          before sending.</p>
       <div class="actions">
-        <button class="next-btn" id="emailBtn">Email results</button>
+        <!-- <button class="next-btn" id="emailBtn">Email results</button> -->
         <button class="next-btn" id="dl">Download results as CSV</button>
       </div>
       <h2>That's all, many thanks!</h2>
